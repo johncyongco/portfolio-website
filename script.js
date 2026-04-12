@@ -147,8 +147,91 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Form submission handling (placeholder for future form implementation)
+// Contact Form Submission to n8n Webhook
 document.addEventListener('DOMContentLoaded', () => {
+    const contactForm = document.getElementById('contactForm');
+    const formMessage = document.getElementById('formMessage');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                message: document.getElementById('message').value.trim(),
+                timestamp: new Date().toISOString(),
+                source: 'Portfolio Website'
+            };
+            
+            // Validate form
+            if (!formData.name || !formData.email || !formData.message) {
+                showFormMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(formData.email)) {
+                showFormMessage('Please enter a valid email address.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+            
+            try {
+                // Send to n8n webhook
+                const response = await fetch('https://n8n.rootinize.team/webhook-test/contact-me', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    // Success
+                    showFormMessage('Thank you! Your message has been sent successfully.', 'success');
+                    contactForm.reset();
+                } else {
+                    // Server error
+                    showFormMessage('Sorry, there was an error sending your message. Please try again.', 'error');
+                }
+            } catch (error) {
+                // Network error
+                console.error('Form submission error:', error);
+                showFormMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                // Reset button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+    }
+    
+    // Helper function to show form messages
+    function showFormMessage(message, type) {
+        formMessage.textContent = message;
+        formMessage.className = 'form-message ' + type;
+        formMessage.style.display = 'block';
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000);
+        }
+    }
+    
+    // Email validation helper
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
     // Add subtle hover effects to cards
     const cards = document.querySelectorAll('.expertise-card, .impact-card, .contact-item');
     
@@ -173,5 +256,5 @@ document.addEventListener('DOMContentLoaded', () => {
 const yearSpan = document.querySelector('.footer-copyright');
 if (yearSpan) {
     const currentYear = new Date().getFullYear();
-    yearSpan.textContent = yearSpan.textContent.replace('2025', currentYear);
+    yearSpan.textContent = `© ${currentYear} John Christian Yongco. All rights reserved.`;
 }
