@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             try {
                 // Send to n8n webhook
-                const response = await fetch('https://n8n.rootinize.team/webhook-test/contact-me', {
+                const response = await fetch('https://n8n.rootinize.team/webhook-test/contact-jc', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
