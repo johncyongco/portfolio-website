@@ -1,0 +1,1 @@
+Open index.html with a static web server. No build required. Portfolio updated October 2026. Google Fonts has local system fallbacks. Email and LinkedIn links work without a backend. The hosted review version does not change jcyongco.pro.
